@@ -1,12 +1,13 @@
+#include <stdio.h>
 
 __global__
-void mult(float *d_A, float *d_B, float *d_C, int n_elem){
+void mul(float *d_A, float *d_B, float *d_C, int n_elem){
   int i = blockIdx.x * blockDim.x + threadIdx.x;
   int j = blockIdx.y * blockDim.y + threadIdx.y;
   if (i < n_elem && j < n_elem){
-      C[i*n_elem+j]=0;
+      d_C[i*n_elem+j]=0;
       for(int k=0; k<n_elem; k++)
-        C[i*n_elem+j] += A[i*n_elem+k] * B[k*n_elem+j];
+        d_C[i*n_elem+j] += d_A[i*n_elem+k] * d_B[k*n_elem+j];
   }
 }
 
@@ -51,7 +52,7 @@ int main(void){
 
   cudaDeviceSynchronize();
 
-  cudaMemcpy(C, d_C, tam_mat, cudamemcpyDeviceToHost);
+  cudaMemcpy(C, d_C, tam_mat, cudaMemcpyDeviceToHost);
 
   cudaFree(d_A);
   cudaFree(d_B);
